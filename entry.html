@@ -1,16 +1,115 @@
 <html>
   <head>
     <script src="./javascript/app.js"></script>
+    <style>
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+      
+      td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+      
+      tr:nth-child(even) {
+        background-color: #dddddd;
+      }
+      </style>
   </head>
   <body>
-    <form name="inputForm" action="action.php" method="POST">
       Nama : 
-      <input type="text" name="nama">
+      <input type="text" name="nama" id="namaValue">
       <br>
       Umur : 
-      <input type="text" name="umur">
+      <input type="text" name="umur" id="umurValue">
       <br>
-      <input type="submit">
-    </form>  
+      <input type="submit" onclick="addRow()">
+    
+    <table id="biotable">
+    </table>
   </body>
+  <script>
+    var arrHead = new Array();
+    arrHead = ['','Nama','Umur'];
+    function addRow(){
+      var myTable = document.getElementById('biotable');
+      var rowCount = myTable.rows.length;
+      var tr = myTable.insertRow(rowCount);
+      tr = myTable.insertRow(rowCount);
+
+      for (var c = 0; c < arrHead.length; c++){
+        var td = document.createElement('td');
+        td = tr.insertCell(c);
+        var nama = document.getElementById('namaValue').value;
+        var umur = document.getElementById('umurValue').value;
+        if (c == 0){
+          var button = document.createElement('input');
+
+          button.setAttribute('type','button');
+          button.setAttribute('value','Remove');
+
+          button.setAttribute('onclick', 'removeRow(this)')
+          td.appendChild(button);
+        }
+        else{
+
+          if (c == 1){
+            var ele = document.createElement('input');
+            ele.setAttribute('type','text');
+            ele.setAttribute('value',nama);
+            td.appendChild(ele);
+          }else if (c == 2){
+            var ele = document.createElement('input');
+            ele.setAttribute('type','text');
+            ele.setAttribute('value',umur);
+            td.appendChild(ele);
+          }
+
+          if (c == 2){
+            insertToDb(nama,umur);
+          }
+        }
+      }
+    }
+
+    function removeRow(oButton){
+      var myTable =  document.getElementById('biotable');
+      var row = oButton.parentNode.parentNode;
+      var cell = oButton.parentNode;;
+      var name = row.getElementsByTagName("input")[1].value;
+      myTable.deleteRow(oButton.parentNode.parentNode.rowIndex);
+      removeFromDb(name);
+    }
+
+    function insertToDb(name,age){
+      var ajx = new XMLHttpRequest();
+      var data = "nama="+name+"&umur="+age;
+      ajx.onreadystatechange = function(){
+        if (ajx.status == 200){
+          console.log(data);
+        }
+      }
+      ajx.open("POST","action.php",true)
+      ajx.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+      ajx.send(data);
+    }
+
+    function removeFromDb(name,age){
+      var ajx = new XMLHttpRequest();
+      var nama = document.getElementById('namaValue').value;
+      var umur = document.getElementById('umurValue').value;
+      var data = "nama="+name+"&umur="+age;
+      ajx.onreadystatechange = function(){
+        if (ajx.status == 200){
+          console.log(data);
+        }
+      }
+      ajx.open("POST","delete.php",true)
+      ajx.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+      ajx.send(data);
+    }
+  </script>
 </html>
